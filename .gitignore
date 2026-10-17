@@ -17,12 +17,13 @@ yarn-error.log*
 # Environment / secrets
 .env
 .env.*
+!.env.example
 *.pem
 *.jks
 *.keystore
 
-# Configuration with API keys - never push this
-/src/app/config.ts
+# Fichier genere depuis .env - jamais pousser
+/src/app/env.generated.ts
 
 # Capacitor - generated web assets
 /android/app/src/main/assets/public
