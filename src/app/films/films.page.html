@@ -1,0 +1,61 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Films</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="rafraichir()" [disabled]="chargement">
+        <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <ion-toolbar>
+    <ion-searchbar
+      placeholder="Rechercher un film"
+      [(ngModel)]="recherche"
+      (ionInput)="lancerRecherche()"
+      debounce="400"
+    ></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="rafraichir($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ion-progress-bar type="indeterminate" *ngIf="chargement"></ion-progress-bar>
+
+  <ion-list *ngIf="!chargement && films.length > 0">
+    <ion-item *ngFor="let film of films" button detail (click)="voirDetail(film)">
+      <ion-thumbnail slot="start">
+        <img [src]="film.image" [alt]="film.titre" />
+      </ion-thumbnail>
+
+      <ion-label>
+        <h2>{{ film.titre }}</h2>
+        <h3>
+          {{ film.annee }}
+          <ion-icon name="star" color="warning"></ion-icon>
+          {{ film.note }}
+        </h3>
+      </ion-label>
+
+      <ion-button
+        slot="end"
+        fill="clear"
+        [color]="estFavori(film) ? 'danger' : 'medium'"
+        (click)="$event.stopPropagation(); basculerFavori(film)"
+      >
+        <ion-icon slot="icon-only" [name]="estFavori(film) ? 'heart' : 'heart-outline'"></ion-icon>
+      </ion-button>
+    </ion-item>
+  </ion-list>
+
+  <ion-item *ngIf="!chargement && films.length === 0">
+    <ion-label class="ion-text-center">
+      <ion-icon name="search-outline" size="large" color="medium"></ion-icon>
+      <h2>Aucun film trouve</h2>
+      <p>Essayez un autre titre.</p>
+    </ion-label>
+  </ion-item>
+</ion-content>

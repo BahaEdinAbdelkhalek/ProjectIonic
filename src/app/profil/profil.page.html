@@ -1,0 +1,64 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Profil</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="seDeconnecter()">
+        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content *ngIf="connecte !== null">
+  <ion-list-header>
+    <ion-label>Mon compte</ion-label>
+  </ion-list-header>
+
+  <ion-list>
+    <ion-item>
+      <ion-avatar slot="start">
+        <img [src]="connecte.photo" [alt]="connecte.prenom" />
+      </ion-avatar>
+
+      <ion-label>
+        <h2>{{ connecte.prenom }} {{ connecte.nom }}</h2>
+        <h3>{{ connecte.email }}</h3>
+      </ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-icon name="calendar-outline" slot="start"></ion-icon>
+      <ion-label>Age</ion-label>
+      <ion-note slot="end">{{ connecte.age }} ans</ion-note>
+    </ion-item>
+
+    <ion-item>
+      <ion-icon name="heart-outline" slot="start"></ion-icon>
+      <ion-label>Films favoris</ion-label>
+      <ion-note slot="end">{{ totalFavoris }}</ion-note>
+    </ion-item>
+
+    <ion-item>
+      <ion-icon name="shield-checkmark-outline" slot="start"></ion-icon>
+      <ion-label>Role</ion-label>
+      <ion-badge slot="end" [color]="estAdmin() ? 'warning' : 'medium'">
+        {{ estAdmin() ? 'Administrateur' : 'Utilisateur' }}
+      </ion-badge>
+    </ion-item>
+  </ion-list>
+
+  <ion-button
+    expand="block"
+    color="warning"
+    *ngIf="estAdmin()"
+    routerLink="/admin"
+  >
+    <ion-icon slot="start" name="settings-outline"></ion-icon>
+    Espace administrateur
+  </ion-button>
+
+  <ion-button expand="block" fill="outline" color="danger" (click)="seDeconnecter()">
+    <ion-icon slot="start" name="log-out-outline"></ion-icon>
+    Se deconnecter
+  </ion-button>
+</ion-content>

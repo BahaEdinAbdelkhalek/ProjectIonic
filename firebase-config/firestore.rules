@@ -1,0 +1,32 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function estConnecte() {
+      return request.auth != null;
+    }
+
+    function estAdmin() {
+      return estConnecte()
+        && get(/databases/$(database)/documents/utilisateurs/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    match /utilisateurs/{idUtilisateur} {
+      allow read: if estConnecte();
+      allow create: if estConnecte() && request.auth.uid == idUtilisateur;
+      allow update: if estAdmin() || (estConnecte() && request.auth.uid == idUtilisateur);
+      allow delete: if estAdmin();
+    }
+
+    match /favoris/{idUtilisateur} {
+      allow read: if estConnecte();
+      allow write: if estConnecte() && request.auth.uid == idUtilisateur;
+    }
+
+    match /films/{idFilm} {
+      allow read: if true;
+      allow write: if estAdmin();
+    }
+  }
+}

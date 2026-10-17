@@ -1,0 +1,47 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Mes favoris</ion-title>
+    <ion-buttons slot="end">
+      <ion-button routerLink="/tabs/films">
+        <ion-icon slot="icon-only" name="add-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-progress-bar type="indeterminate" *ngIf="chargement"></ion-progress-bar>
+
+  <ion-list *ngIf="!chargement && films.length > 0">
+    <ion-item-sliding *ngFor="let film of films">
+      <ion-item button detail (click)="voirDetail(film)">
+        <ion-thumbnail slot="start">
+          <img [src]="film.image" [alt]="film.titre" />
+        </ion-thumbnail>
+
+        <ion-label>
+          <h2>{{ film.titre }}</h2>
+          <h3>
+            {{ film.annee }}
+            <ion-icon name="star" color="warning"></ion-icon>
+            {{ film.note }}
+          </h3>
+        </ion-label>
+      </ion-item>
+
+      <ion-item-options side="end">
+        <ion-item-option color="danger" (click)="retirer(film)">
+          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+        </ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+  </ion-list>
+
+  <ion-item *ngIf="!chargement && films.length === 0">
+    <ion-label class="ion-text-center">
+      <ion-icon name="heart-outline" size="large" color="medium"></ion-icon>
+      <h2>Aucun film favori</h2>
+      <p>Ajoutez des films depuis l onglet Films.</p>
+    </ion-label>
+  </ion-item>
+</ion-content>

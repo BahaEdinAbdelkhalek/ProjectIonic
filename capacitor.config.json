@@ -1,0 +1,5 @@
+{
+  "appId": "com.projetionic.app",
+  "appName": "CinWatch",
+  "webDir": "dist/app/browser"
+}

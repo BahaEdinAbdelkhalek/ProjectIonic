@@ -1,0 +1,74 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Matching</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="rafraichir()">
+        <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="rafraichir($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ion-list-header *ngIf="totalFavoris > 0">
+    <ion-label>
+      Vos {{ totalFavoris }} films favoris compares a ceux des autres utilisateurs.
+      Seuls les taux superieurs a {{ seuil }}% sont affiches.
+    </ion-label>
+  </ion-list-header>
+
+  <ion-list *ngIf="correspondances.length > 0">
+    <ion-item *ngFor="let correspondance of correspondances">
+      <ion-avatar slot="start">
+        <img
+          [src]="correspondance.utilisateur.photo"
+          [alt]="correspondance.utilisateur.prenom"
+        />
+      </ion-avatar>
+
+      <ion-label>
+        <h2>
+          {{ correspondance.utilisateur.prenom }} {{ correspondance.utilisateur.nom }}
+        </h2>
+        <h3>{{ correspondance.utilisateur.age }} ans</h3>
+
+        <div class="ion-flex ion-wrap ion-justify-content-start">
+          <ion-chip
+            *ngFor="let film of correspondance.filmsCommuns"
+            outline
+            class="ion-margin"
+          >
+            {{ film.titre }}
+          </ion-chip>
+        </div>
+      </ion-label>
+
+      <ion-badge slot="end" [color]="couleurTaux(correspondance.taux)">
+        {{ correspondance.taux }}%
+      </ion-badge>
+    </ion-item>
+  </ion-list>
+
+  <ion-item *ngIf="totalFavoris === 0">
+    <ion-label class="ion-text-center">
+      <ion-icon name="heart-outline" size="large" color="medium"></ion-icon>
+      <h2>Aucun favori</h2>
+      <p>Ajoutez des films pour lancer le matching.</p>
+      <ion-button routerLink="/tabs/films" fill="outline" size="small">
+        Parcourir les films
+      </ion-button>
+    </ion-label>
+  </ion-item>
+
+  <ion-item *ngIf="totalFavoris > 0 && correspondances.length === 0">
+    <ion-label class="ion-text-center">
+      <ion-icon name="people-outline" size="large" color="medium"></ion-icon>
+      <h2>Aucune correspondance</h2>
+      <p>Personne ne depasse {{ seuil }}% pour le moment.</p>
+    </ion-label>
+  </ion-item>
+</ion-content>

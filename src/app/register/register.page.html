@@ -1,0 +1,81 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/login" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Inscription</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-list lines="full">
+    <ion-item>
+      <ion-avatar slot="start" *ngIf="photo">
+        <img [src]="photo" alt="Photo de profil" />
+      </ion-avatar>
+
+      <ion-label>
+        <h2>Photo de profil</h2>
+        <p>Obligatoire pour creer un compte</p>
+      </ion-label>
+
+      <ion-button slot="end" fill="outline" size="small" (click)="prendrePhoto()" [disabled]="photoEnCours">
+        <ion-icon slot="start" name="camera-outline"></ion-icon>
+        Camera
+      </ion-button>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        label="Prenom"
+        labelPlacement="stacked"
+        [(ngModel)]="prenom"
+        [errorText]="erreurPrenom"
+      ></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        label="Nom"
+        labelPlacement="stacked"
+        [(ngModel)]="nom"
+        [errorText]="erreurNom"
+      ></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        label="Age"
+        labelPlacement="stacked"
+        type="number"
+        min="13"
+        max="120"
+        [(ngModel)]="age"
+        [errorText]="erreurAge"
+      ></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        label="Email"
+        labelPlacement="stacked"
+        type="email"
+        inputmode="email"
+        [(ngModel)]="email"
+        [errorText]="erreurEmail"
+      ></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        label="Mot de passe"
+        labelPlacement="stacked"
+        type="password"
+        [(ngModel)]="motDePasse"
+        [errorText]="erreurMotDePasse"
+      ></ion-input>
+    </ion-item>
+  </ion-list>
+
+  <ion-button expand="block" (click)="sInscrire()">Creer mon compte</ion-button>
+</ion-content>

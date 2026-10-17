@@ -1,0 +1,68 @@
+# Angular / TypeScript
+/dist
+/tmp
+/out-tsc
+/bazel-out
+/.angular/cache
+/coverage
+/typings
+.sass-cache/
+
+# Node
+/node_modules
+npm-debug.log*
+yarn-error.log*
+*.log
+
+# Environment / secrets
+.env
+.env.*
+*.pem
+*.jks
+*.keystore
+
+# Capacitor - generated web assets
+/android/app/src/main/assets/public
+/android/app/src/main/assets/capacitor.config.json
+/android/app/src/main/assets/capacitor.plugins.json
+/android/app/src/main/res/xml/config.xml
+
+# Android build output
+/android/.gradle
+/android/build
+/android/app/build
+/android/local.properties
+/android/captures
+/android/.idea
+/android/*.iml
+*.apk
+*.aab
+*.aar
+
+# iOS (if generated later)
+/ios/App/Pods
+/ios/App/build
+/ios/App/Podfile.lock
+
+# Cordova plugins for Capacitor
+/android/capacitor-cordova-android-plugins
+
+# IDEs and editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
+
+# System files
+.DS_Store
+Thumbs.db
+desktop.ini

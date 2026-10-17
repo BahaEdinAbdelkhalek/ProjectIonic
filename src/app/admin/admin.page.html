@@ -1,0 +1,83 @@
+<ion-header>
+  <ion-toolbar color="warning">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/profil" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Administration</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-list-header>
+      <ion-label>Catalogue</ion-label>
+    </ion-list-header>
+
+    <ion-item>
+      <ion-input
+        label="Titre"
+        labelPlacement="stacked"
+        [(ngModel)]="titreFilm"
+        [errorText]="erreurTitre"
+      ></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        label="Annee"
+        labelPlacement="stacked"
+        type="number"
+        min="1888"
+        max="2100"
+        [(ngModel)]="anneeFilm"
+        [errorText]="erreurAnnee"
+      ></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-textarea
+        label="Resume"
+        labelPlacement="stacked"
+        rows="4"
+        [(ngModel)]="resumeFilm"
+      ></ion-textarea>
+    </ion-item>
+  </ion-list>
+
+  <ion-button expand="block" (click)="ajouterFilm()">
+    <ion-icon slot="start" name="add-outline"></ion-icon>
+    Ajouter le film
+  </ion-button>
+
+  <ion-list>
+    <ion-list-header>
+      <ion-label>Utilisateurs</ion-label>
+    </ion-list-header>
+
+    <ion-item-sliding *ngFor="let utilisateur of utilisateurs">
+      <ion-item [detail]="false">
+        <ion-avatar slot="start">
+          <img [src]="utilisateur.photo" [alt]="utilisateur.prenom" />
+        </ion-avatar>
+
+        <ion-label>
+          <h2>{{ utilisateur.prenom }} {{ utilisateur.nom }}</h2>
+          <h3>{{ utilisateur.email }}</h3>
+        </ion-label>
+
+        <ion-badge slot="end" [color]="utilisateur.actif ? 'success' : 'medium'">
+          {{ utilisateur.actif ? 'actif' : 'desactive' }}
+        </ion-badge>
+      </ion-item>
+
+      <ion-item-options side="end">
+        <ion-item-option
+          [color]="utilisateur.actif ? 'danger' : 'success'"
+          (click)="changerActif(utilisateur)"
+        >
+          <ion-icon slot="icon-only" [name]="utilisateur.actif ? 'ban-outline' : 'refresh-outline'"></ion-icon>
+        </ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+  </ion-list>
+</ion-content>
