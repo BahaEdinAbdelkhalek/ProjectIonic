@@ -21,6 +21,9 @@ yarn-error.log*
 *.jks
 *.keystore
 
+# Configuration with API keys - never push this
+/src/app/config.ts
+
 # Capacitor - generated web assets
 /android/app/src/main/assets/public
 /android/app/src/main/assets/capacitor.config.json

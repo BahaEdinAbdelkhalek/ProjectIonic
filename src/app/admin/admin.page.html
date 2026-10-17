@@ -62,12 +62,27 @@
 
         <ion-label>
           <h2>{{ utilisateur.prenom }} {{ utilisateur.nom }}</h2>
-          <h3>{{ utilisateur.email }}</h3>
+          <h3>
+            {{ utilisateur.email }} - compte
+            <ion-text [color]="utilisateur.actif ? 'success' : 'medium'">
+              {{ utilisateur.actif ? 'actif' : 'desactive' }}
+            </ion-text>
+          </h3>
         </ion-label>
 
-        <ion-badge slot="end" [color]="utilisateur.actif ? 'success' : 'medium'">
-          {{ utilisateur.actif ? 'actif' : 'desactive' }}
-        </ion-badge>
+        <ion-button
+          slot="end"
+          size="small"
+          [fill]="utilisateur.actif ? 'outline' : 'solid'"
+          [color]="utilisateur.actif ? 'danger' : 'success'"
+          (click)="changerActif(utilisateur)"
+        >
+          <ion-icon
+            slot="start"
+            [name]="utilisateur.actif ? 'ban-outline' : 'refresh-outline'"
+          ></ion-icon>
+          {{ utilisateur.actif ? 'Desactiver' : 'Reactiver' }}
+        </ion-button>
       </ion-item>
 
       <ion-item-options side="end">
