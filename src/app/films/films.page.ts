@@ -50,7 +50,7 @@ export class FilmsPage implements OnInit {
   async lancerRecherche(): Promise<void> {
     this.chargement = true;
 
-    this.filmsService.rechercher(this.recherche).subscribe(async (films) => {
+    this.filmsService.rechercher(this.recherche).subscribe((films) => {
       this.films = films;
       this.chargement = false;
     });
