@@ -20,6 +20,7 @@ export class AdminPage {
 
   erreurTitre = '';
   erreurAnnee = '';
+  message = '';
 
   constructor(
     private utilisateursService: UtilisateurService,
@@ -40,6 +41,7 @@ export class AdminPage {
   private validerFilm(): boolean {
     this.erreurTitre = '';
     this.erreurAnnee = '';
+    this.message = '';
 
     if (this.titreFilm.trim() === '') {
       this.erreurTitre = 'Le titre est obligatoire.';
@@ -51,6 +53,10 @@ export class AdminPage {
       this.erreurAnnee = 'L annee est obligatoire.';
     } else if (Number(this.anneeFilm) < 1888 || Number(this.anneeFilm) > 2100) {
       this.erreurAnnee = 'L annee doit etre entre 1888 et 2100.';
+    }
+
+    if (this.erreurTitre !== '' || this.erreurAnnee !== '') {
+      this.message = 'Corrigez les champs en rouge avant de valider.';
     }
 
     return this.erreurTitre === '' && this.erreurAnnee === '';

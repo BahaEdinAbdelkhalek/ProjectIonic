@@ -27,6 +27,7 @@ export class RegisterPage {
   erreurEmail = '';
   erreurMotDePasse = '';
   erreurPhoto = '';
+  message = '';
 
   constructor(
     private utilisateurs: UtilisateurService,
@@ -42,6 +43,7 @@ export class RegisterPage {
     this.erreurEmail = '';
     this.erreurMotDePasse = '';
     this.erreurPhoto = '';
+    this.message = '';
   }
 
   async prendrePhoto(): Promise<void> {
@@ -115,6 +117,7 @@ export class RegisterPage {
     }
 
     if (!(await this.valider())) {
+      this.message = 'Corrigez les champs en rouge avant de valider.';
       return;
     }
 

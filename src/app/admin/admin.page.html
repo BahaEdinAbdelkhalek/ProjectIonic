@@ -44,6 +44,10 @@
     </ion-item>
   </ion-list>
 
+  <ion-note color="danger" class="ion-padding-start ion-padding-end" *ngIf="message">
+    {{ message }}
+  </ion-note>
+
   <ion-button expand="block" (click)="ajouterFilm()">
     <ion-icon slot="start" name="add-outline"></ion-icon>
     Ajouter le film

@@ -77,5 +77,9 @@
     </ion-item>
   </ion-list>
 
+  <ion-note color="danger" class="ion-padding-start ion-padding-end" *ngIf="message">
+    {{ message }}
+  </ion-note>
+
   <ion-button expand="block" (click)="sInscrire()">Creer mon compte</ion-button>
 </ion-content>
