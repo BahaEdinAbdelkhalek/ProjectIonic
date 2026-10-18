@@ -14,7 +14,6 @@ interface FilmTmdb {
   title: string;
   overview: string;
   poster_path: string | null;
-  backdrop_path: string | null;
   release_date: string;
   vote_average: number;
 }
@@ -25,16 +24,6 @@ interface ReponseTmdb {
 
 @Injectable({ providedIn: 'root' })
 export class FilmService {
-  private static readonly IMAGE_PAR_DEFAUT =
-    'data:image/svg+xml;utf8,' +
-    encodeURIComponent(
-      '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="450">' +
-        '<rect width="300" height="450" fill="#dfe3e9"/>' +
-        '<text x="150" y="225" text-anchor="middle" font-family="sans-serif" ' +
-        'font-size="17" fill="#7a828e">Affiche indisponible</text>' +
-        '</svg>',
-    );
-
   private filmsAdmin: Film[] = [];
   private filmsAdminCharges = false;
   private filmsMemoire: Film[] = [];
@@ -96,11 +85,7 @@ export class FilmService {
       return CONFIG.tmdbUrlImage + source.poster_path;
     }
 
-    if (source.backdrop_path !== null && source.backdrop_path !== '') {
-      return CONFIG.tmdbUrlImage + source.backdrop_path;
-    }
-
-    return FilmService.IMAGE_PAR_DEFAUT;
+    return '';
   }
 
   private depuisTmdb(source: FilmTmdb): Film {
@@ -132,6 +117,10 @@ export class FilmService {
     return films;
   }
 
+  private avecImage(films: Film[]): Film[] {
+    return films.filter((film) => film.image !== '');
+  }
+
   getPopulaires(): Observable<Film[]> {
     if (!this.getBd()) {
       return of(this.getCatalogue());
@@ -143,10 +132,12 @@ export class FilmService {
       })
       .pipe(
         map((reponse) =>
+          this.avecImage(
           this.memoriser([
             ...reponse.results.map((film) => this.depuisTmdb(film)),
             ...this.filmsAdmin,
           ]),
+        ),
         ),
       );
   }
@@ -167,10 +158,12 @@ export class FilmService {
       })
       .pipe(
         map((reponse) =>
+          this.avecImage(
           this.memoriser([
             ...reponse.results.map((film) => this.depuisTmdb(film)),
             ...this.filmsAdmin,
           ]),
+        ),
         ),
       );
   }
