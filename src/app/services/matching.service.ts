@@ -17,13 +17,13 @@ export class MatchingService {
   }
 
   calculerTaux(mesFilms: Film[], sesFilms: Film[]): number {
-    if (mesFilms.length === 0) {
+    if (mesFilms.length === 0 || sesFilms.length === 0) {
       return 0;
     }
 
-    const communs = this.getFilmsCommuns(mesFilms, sesFilms);
+    const communs = this.getFilmsCommuns(mesFilms, sesFilms).length;
 
-    return Math.round((communs.length / mesFilms.length) * 100);
+    return Math.round((communs / (mesFilms.length + sesFilms.length)) * 200);
   }
 
   async getCorrespondances(moi: Utilisateur): Promise<Correspondance[]> {

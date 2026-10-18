@@ -45,7 +45,7 @@ describe('MatchingService', () => {
     expect(matching.getFilmsCommuns(mesFilms, sesFilms).length).toBe(0);
   });
 
-  it('calcule le taux avec le recouvrement', () => {
+  it('calcule le taux avec le coefficient de Dice', () => {
     const mesFilms = [
       creerFilm(1, 'A'),
       creerFilm(2, 'B'),
@@ -55,11 +55,15 @@ describe('MatchingService', () => {
     ];
     const sesFilms = [creerFilm(1, 'A'), creerFilm(2, 'B'), creerFilm(3, 'C'), creerFilm(4, 'D')];
 
-    expect(matching.calculerTaux(mesFilms, sesFilms)).toBe(80);
+    expect(matching.calculerTaux(mesFilms, sesFilms)).toBe(89);
   });
 
   it('renvoie 0 quand ma liste est vide', () => {
     expect(matching.calculerTaux([], [creerFilm(1, 'A')])).toBe(0);
+  });
+
+  it('renvoie 0 quand la liste de lautre est vide', () => {
+    expect(matching.calculerTaux([creerFilm(1, 'A')], [])).toBe(0);
   });
 
   it('renvoie 100 quand les listes sont identiques', () => {
@@ -68,20 +72,28 @@ describe('MatchingService', () => {
     expect(matching.calculerTaux(films, films)).toBe(100);
   });
 
-  it('atteint 100 quand l autre liste est plus grande mais contient les miennes', () => {
-    const mesFilms = [creerFilm(1, 'A'), creerFilm(2, 'B'), creerFilm(3, 'C')];
-    const sesFilms = [
+  it('donne le meme taux dans les deux sens', () => {
+    const a = [creerFilm(1, 'A'), creerFilm(2, 'B'), creerFilm(3, 'C'), creerFilm(4, 'D')];
+    const b = [creerFilm(1, 'A'), creerFilm(2, 'B'), creerFilm(3, 'E')];
+
+    expect(matching.calculerTaux(a, b)).toBe(matching.calculerTaux(b, a));
+  });
+
+  it('penalise une liste qui est un sous-ensemble de lautre', () => {
+    const longue = [
       creerFilm(1, 'A'),
       creerFilm(2, 'B'),
       creerFilm(3, 'C'),
       creerFilm(4, 'D'),
       creerFilm(5, 'E'),
     ];
+    const courte = [creerFilm(1, 'A'), creerFilm(2, 'B'), creerFilm(3, 'C')];
 
-    expect(matching.calculerTaux(mesFilms, sesFilms)).toBe(100);
+    expect(matching.calculerTaux(courte, longue)).toBeLessThan(100);
+    expect(matching.calculerTaux(courte, longue)).toBe(75);
   });
 
-  it('refuse un taux inferieur au seuil', () => {
+  it('atteint 75 pile pour un sous-ensemble de 5 et 3', () => {
     const mesFilms = [
       creerFilm(1, 'A'),
       creerFilm(2, 'B'),
@@ -89,11 +101,10 @@ describe('MatchingService', () => {
       creerFilm(4, 'D'),
       creerFilm(5, 'E'),
     ];
-    const sesFilms = [creerFilm(1, 'A'), creerFilm(2, 'B'), creerFilm(9, 'Z')];
+    const sesFilms = [creerFilm(1, 'A'), creerFilm(2, 'B'), creerFilm(3, 'C')];
 
-    const taux = matching.calculerTaux(mesFilms, sesFilms);
-
-    expect(taux).toBeLessThanOrEqual(SEUIL_CORRESPONDANCE);
+    expect(matching.calculerTaux(mesFilms, sesFilms)).toBe(75);
+    expect(matching.calculerTaux(mesFilms, sesFilms)).toBeLessThanOrEqual(SEUIL_CORRESPONDANCE);
   });
 
   it('utilise un seuil de 75 pour cent', () => {
