@@ -41,6 +41,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'cinema_app.middleware.TempsReponseMiddleware',
+    'cinema_app.middleware.DerniereVisiteMiddleware',
 ]
 
 ROOT_URLCONF = 'cinwatch_project.urls'
@@ -91,6 +93,9 @@ LANGUAGE_CODE = 'fr-fr'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
+
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'
 
 
 STATIC_URL = 'static/'

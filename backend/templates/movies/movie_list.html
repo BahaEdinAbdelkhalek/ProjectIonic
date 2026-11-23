@@ -2,22 +2,39 @@
 {% block title %}Liste des films{% endblock %}
 
 {% block content %}
-<h1 class="mb-4">Les films</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1>Les films ({{ total_films }})</h1>
+  <a href="{% url 'movie_create' %}" class="btn btn-primary">Ajouter un film</a>
+</div>
 
 <div class="form-check mb-3">
-  <input class="form-check-input" type="checkbox" id="filtrerNouveaux">
-  <label class="form-check-label" for="filtrerNouveaux">Afficher uniquement les films recents</label>
+  <input class="form-check-input" type="checkbox" id="filtrerNouveaux"
+         {% if nouveaux == '1' %}checked{% endif %}>
+  <label class="form-check-label" for="filtrerNouveaux">
+    Afficher uniquement les films recents
+  </label>
 </div>
 
 <div class="row" id="listeFilms">
   {% for movie in movies %}
   <div class="col-md-4 mb-4 film-item" data-new="{% if movie.new %}1{% else %}0{% endif %}">
     <div class="card h-100">
-      {% if movie.image %}<img src="{{ movie.image.url }}" class="card-img-top" style="height:250px;object-fit:cover;">{% endif %}
+      {% if movie.image %}
+        <img src="{{ movie.image.url }}" class="card-img-top" style="height:200px;object-fit:cover;">
+      {% endif %}
       <div class="card-body">
-        <h5 class="card-title"><a href="{% url 'movie_detail' movie.pk %}">{{ movie.title }}</a></h5>
-        <p class="card-text text-muted">{{ movie.release_year }}</p>
+        <h5 class="card-title">
+          <a href="{% url 'movie_detail' movie.pk %}">{{ movie.title }}</a>
+        </h5>
+        <p class="card-text text-muted mb-1">{{ movie.release_year }}</p>
+        <p class="card-text small">
+          {{ movie.note }}/10 - {{ movie.nombre_favoris }} favori(s)
+        </p>
         {% if movie.new %}<span class="badge bg-success">Nouveau</span>{% endif %}
+        <div class="mt-2">
+          <a href="{% url 'movie_update' movie.pk %}" class="btn btn-sm btn-warning">Modifier</a>
+          <a href="{% url 'movie_delete' movie.pk %}" class="btn btn-sm btn-danger">Supprimer</a>
+        </div>
       </div>
     </div>
   </div>
@@ -26,7 +43,25 @@
   {% endfor %}
 </div>
 
-<a href="{% url 'movie_create' %}" class="btn btn-primary">Ajouter un film</a>
+{% if is_paginated %}
+<nav>
+  <ul class="pagination justify-content-center">
+    {% if page_obj.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Precedent</a>
+      </li>
+    {% endif %}
+    <li class="page-item active">
+      <span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+    </li>
+    {% if page_obj.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Suivant</a>
+      </li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
 
 <script>
   const cases = document.getElementById('filtrerNouveaux');

@@ -67,5 +67,17 @@ class Command(BaseCommand):
             admin.set_password('admin123')
             admin.save()
 
+        from django.contrib.auth.models import Group, Permission
+        from django.contrib.contenttypes.models import ContentType
+
+        groupe_admin, _ = Group.objects.get_or_create(name='Administrateurs')
+        content_type = ContentType.objects.get_for_model(Movie)
+        permissions = Permission.objects.filter(content_type=content_type)
+        for permission in permissions:
+            groupe_admin.permissions.add(permission)
+
+        admin.groups.add(groupe_admin)
+
+        self.stdout.write('Groupe Administrateurs cree avec permissions')
         self.stdout.write('Admin Django : admin / admin123')
         self.stdout.write('Donnees de demonstration pretes')

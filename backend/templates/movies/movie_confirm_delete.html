@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Supprimer {{ movie.title }}{% endblock %}
+
+{% block content %}
+<div class="card border-danger">
+  <div class="card-header bg-danger text-white">
+    Confirmation de suppression
+  </div>
+  <div class="card-body">
+    <p>Voulez-vous vraiment supprimer le film <strong>{{ movie.title }}</strong> ?</p>
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Oui, supprimer</button>
+      <a href="{% url 'movie_detail' movie.pk %}" class="btn btn-secondary">Annuler</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

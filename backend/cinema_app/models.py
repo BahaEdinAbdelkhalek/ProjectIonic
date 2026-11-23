@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 class Movie(models.Model):
@@ -13,9 +14,17 @@ class Movie(models.Model):
 
     class Meta:
         ordering = ['-release_year']
+        verbose_name = 'Film'
+        verbose_name_plural = 'Films'
 
     def __str__(self):
         return self.title
+
+    def est_recent(self):
+        return self.release_year >= timezone.now().year - 5
+
+    def nombre_favoris(self):
+        return self.favori_set.count()
 
     def image_preview(self):
         if self.image:
@@ -35,8 +44,21 @@ class Utilisateur(models.Model):
     role = models.CharField(max_length=10, default='user')
     actif = models.BooleanField(default=True)
 
+    class Meta:
+        verbose_name = 'Utilisateur'
+        verbose_name_plural = 'Utilisateurs'
+
     def __str__(self):
         return self.prenom + ' ' + self.nom
+
+    def nom_complet(self):
+        return self.prenom + ' ' + self.nom
+
+    def nombre_favoris(self):
+        return self.favori_set.count()
+
+    def est_admin(self):
+        return self.role == 'admin'
 
     def image_preview(self):
         if self.photo:
@@ -54,6 +76,9 @@ class Favori(models.Model):
 
     class Meta:
         unique_together = ('utilisateur', 'movie')
+        verbose_name = 'Favori'
+        verbose_name_plural = 'Favoris'
+        ordering = ['-date_ajout']
 
     def __str__(self):
         return self.utilisateur.prenom + ' - ' + self.movie.title

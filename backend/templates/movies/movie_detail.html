@@ -11,9 +11,12 @@
     <p class="text-muted">Annee : {{ movie.release_year }}</p>
     <p>{{ movie.description }}</p>
     <p>Note : {{ movie.note }}</p>
+    <p>Favoris : {{ movie.nombre_favoris }}</p>
     {% if movie.new %}<span class="badge bg-success">Nouveau</span>{% endif %}
+    <p class="text-muted">Ajoute dans la base : {{ movie.date_ajout|default:'-' }}</p>
     <br><br>
     <a href="{% url 'movie_update' movie.pk %}" class="btn btn-warning">Modifier</a>
+    <a href="{% url 'movie_delete' movie.pk %}" class="btn btn-danger">Supprimer</a>
     <a href="{% url 'movie_list' %}" class="btn btn-secondary">Retour</a>
   </div>
 </div>

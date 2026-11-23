@@ -11,6 +11,10 @@ Backend conforme aux TPs du cours Django du professeur Nizar MAATOUG.
 | **Tp image et admin** (Movie, ImageField, filtrage, Jazzmin) | `Movie` avec `ImageField`, `MEDIA_ROOT/movies`, **filtrage sans redirection** en JS, admin `@admin.register` avec `list_display`, `list_editable`, `search_fields`, `list_filter`, `list_per_page = 10`, `image_preview`, `readonly_fields`, et **Jazzmin** |
 | **Cours : REST API / DRF** | `api_views.py` avec `@api_view`, `TokenAuthentication`, sérialiseurs |
 | **Cours : Authentification, permissions** | Connexion/inscription avec mot de passe haché, `IsAuthenticated`, rôle `admin` vérifié côté serveur |
+| **Cours : Sessions et Middlewares** | `middleware.py` : header `X-Temps-Reponse`, date de dernière visite et filtre stockés en session |
+| **Cours : Django Signals** | `signals.py` : profil créé automatiquement à la création d'un `User`, logs des ajouts/retraits de favoris |
+| **Cours : groupes et permissions** | Groupe « Administrateurs » avec les permissions sur `Movie`, `LoginRequiredMixin` sur les vues de modification |
+| **TP-CBV-CRUD : CRUD complet** | `DeleteView` et template de confirmation de suppression |
 
 ## Structure
 
@@ -25,7 +29,10 @@ backend/
   cinema_app/
     models.py                     Movie, Utilisateur, Favori
     forms.py                      ModelForm + crispy
-    views.py                      CBV (liste, détail, ajout, modification)
+    views.py                      CBV (liste, détail, ajout, modification, suppression)
+    signals.py                    signaux Django
+    middleware.py                 middlewares personnalisés
+    tests.py                      12 tests unitaires
     urls.py                       URLs des pages HTML
     api_views.py                  endpoints REST (DRF)
     api_urls.py                   URLs de l'API
