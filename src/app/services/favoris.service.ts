@@ -1,32 +1,35 @@
 import { Injectable } from '@angular/core';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { firstValueFrom } from 'rxjs';
 import { Film } from '../models';
-import { FirebaseService } from './firebase.service';
+import { ApiService } from './api.service';
 
-const COLLECTION = 'favoris';
+interface FilmApi {
+  id: number;
+  titre: string;
+  image: string;
+  resume: string;
+  annee: number;
+  note: number;
+}
 
 @Injectable({ providedIn: 'root' })
 export class FavorisService {
-  constructor(private firebase: FirebaseService) {}
+  constructor(private api: ApiService) {}
 
-  private async ecrire(utilisateurId: string, films: Film[]): Promise<void> {
-    await setDoc(doc(this.firebase.db, COLLECTION, utilisateurId), { films: films });
+  private depuisApi(source: FilmApi): Film {
+    return {
+      id: source.id,
+      titre: source.titre,
+      image: source.image,
+      resume: source.resume,
+      annee: source.annee,
+      note: source.note,
+    };
   }
 
   async getFavoris(utilisateurId: string): Promise<Film[]> {
-    const document = await getDoc(doc(this.firebase.db, COLLECTION, utilisateurId));
-
-    if (!document.exists()) {
-      return [];
-    }
-
-    const films = document.data()['films'];
-
-    if (!Array.isArray(films)) {
-      return [];
-    }
-
-    return films as Film[];
+    const films = await firstValueFrom(this.api.get<FilmApi[]>('/favoris'));
+    return films.map((film) => this.depuisApi(film));
   }
 
   async getIds(utilisateurId: string): Promise<number[]> {
@@ -39,38 +42,20 @@ export class FavorisService {
     return ids.includes(filmId);
   }
 
-  async ajouter(utilisateurId: string, film: Film): Promise<void> {
-    const films = await this.getFavoris(utilisateurId);
-
-    if (!films.some((f) => f.id === film.id)) {
-      await this.ecrire(utilisateurId, [...films, film]);
-    }
+  async ajouter(utilisateurId: string, filmId: number): Promise<void> {
+    await firstValueFrom(this.api.post<{ favori: boolean }>('/favoris/' + filmId, {}));
   }
 
   async supprimer(utilisateurId: string, filmId: number): Promise<void> {
-    const films = await this.getFavoris(utilisateurId);
-    await this.ecrire(
-      utilisateurId,
-      films.filter((f) => f.id !== filmId),
-    );
+    await firstValueFrom(this.api.post<{ favori: boolean }>('/favoris/' + filmId, {}));
   }
 
   async basculer(utilisateurId: string, film: Film): Promise<boolean> {
-    const films = await this.getFavoris(utilisateurId);
-
-    if (films.some((f) => f.id === film.id)) {
-      await this.ecrire(
-        utilisateurId,
-        films.filter((f) => f.id !== film.id),
-      );
-      return false;
-    }
-
-    await this.ecrire(utilisateurId, [...films, film]);
-    return true;
+    const resultat = await firstValueFrom(
+      this.api.post<{ favori: boolean }>('/favoris/' + film.id, {}),
+    );
+    return resultat.favori;
   }
 
-  async remplacer(utilisateurId: string, films: Film[]): Promise<void> {
-    await this.ecrire(utilisateurId, films);
-  }
+  async remplacer(utilisateurId: string, films: Film[]): Promise<void> {}
 }

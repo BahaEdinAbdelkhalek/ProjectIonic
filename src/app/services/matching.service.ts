@@ -1,14 +1,39 @@
 import { Injectable } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { Correspondance, Film, Utilisateur } from '../models';
-import { FavorisService } from './favoris.service';
+import { ApiService } from './api.service';
 import { UtilisateurService } from './utilisateur.service';
 
 export const SEUIL_CORRESPONDANCE = 75;
 
+interface FilmApi {
+  id: number;
+  titre: string;
+  image: string;
+  resume: string;
+  annee: number;
+  note: number;
+}
+
+interface CorrespondanceApi {
+  utilisateur: {
+    id: number;
+    nom: string;
+    prenom: string;
+    age: number;
+    photo: string;
+    email: string;
+    role: string;
+    actif: boolean;
+  };
+  taux: number;
+  filmsCommuns: FilmApi[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class MatchingService {
   constructor(
-    private favoris: FavorisService,
+    private api: ApiService,
     private utilisateurs: UtilisateurService,
   ) {}
 
@@ -27,27 +52,28 @@ export class MatchingService {
   }
 
   async getCorrespondances(moi: Utilisateur): Promise<Correspondance[]> {
-    const mesFilms = await this.favoris.getFavoris(moi.id);
-    const tous = await this.utilisateurs.getTous();
-    const correspondances: Correspondance[] = [];
+    const data = await firstValueFrom(this.api.get<CorrespondanceApi[]>('/matching'));
 
-    for (const autre of tous) {
-      if (autre.id === moi.id || !autre.actif) {
-        continue;
-      }
-
-      const sesFilms = await this.favoris.getFavoris(autre.id);
-      const taux = this.calculerTaux(mesFilms, sesFilms);
-
-      if (taux > SEUIL_CORRESPONDANCE) {
-        correspondances.push({
-          utilisateur: autre,
-          taux: taux,
-          filmsCommuns: this.getFilmsCommuns(mesFilms, sesFilms),
-        });
-      }
-    }
-
-    return correspondances.sort((a, b) => b.taux - a.taux);
+    return data.map((item) => ({
+      utilisateur: {
+        id: String(item.utilisateur.id),
+        nom: item.utilisateur.nom,
+        prenom: item.utilisateur.prenom,
+        age: item.utilisateur.age,
+        photo: item.utilisateur.photo,
+        email: item.utilisateur.email,
+        role: item.utilisateur.role === 'admin' ? 'admin' : 'user',
+        actif: item.utilisateur.actif,
+      } as Utilisateur,
+      taux: item.taux,
+      filmsCommuns: item.filmsCommuns.map((film) => ({
+        id: film.id,
+        titre: film.titre,
+        image: film.image,
+        resume: film.resume,
+        annee: film.annee,
+        note: film.note,
+      })),
+    }));
   }
 }

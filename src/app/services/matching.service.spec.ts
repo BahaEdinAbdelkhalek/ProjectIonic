@@ -1,5 +1,5 @@
 import { Film } from '../models';
-import { FavorisService } from './favoris.service';
+import { ApiService } from './api.service';
 import { MatchingService, SEUIL_CORRESPONDANCE } from './matching.service';
 import { UtilisateurService } from './utilisateur.service';
 
@@ -19,7 +19,7 @@ describe('MatchingService', () => {
 
   beforeEach(() => {
     matching = new MatchingService(
-      null as unknown as FavorisService,
+      null as unknown as ApiService,
       null as unknown as UtilisateurService,
     );
   });

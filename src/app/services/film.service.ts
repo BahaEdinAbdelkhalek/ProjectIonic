@@ -1,25 +1,18 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, map, of } from 'rxjs';
-import { collection, doc, getDoc, getDocs, setDoc } from 'firebase/firestore';
-import { CONFIG } from '../config';
-import { FILMS_DEPART } from '../donnees';
+import { firstValueFrom, Observable, map } from 'rxjs';
+import { COMPTES_DEMO, FILMS_DEPART, filmsDepuisIds } from '../donnees';
 import { Film } from '../models';
-import { FirebaseService } from './firebase.service';
+import { ApiService } from './api.service';
+import { CONFIG } from '../config';
+import { HttpClient } from '@angular/common/http';
 
-const COLLECTION = 'films';
-
-interface FilmTmdb {
+interface FilmApi {
   id: number;
-  title: string;
-  overview: string;
-  poster_path: string | null;
-  release_date: string;
-  vote_average: number;
-}
-
-interface ReponseTmdb {
-  results: FilmTmdb[];
+  titre: string;
+  image: string;
+  resume: string;
+  annee: number;
+  note: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -29,31 +22,15 @@ export class FilmService {
   private filmsMemoire: Film[] = [];
 
   constructor(
+    private api: ApiService,
     private http: HttpClient,
-    private firebase: FirebaseService,
   ) {}
 
   async chargerFilmsAdmin(): Promise<void> {
-    if (this.filmsAdminCharges || !this.firebase.estConfigure()) {
+    if (this.filmsAdminCharges) {
       return;
     }
 
-    const resultat = await getDocs(collection(this.firebase.db, COLLECTION));
-    const films: Film[] = [];
-
-    resultat.forEach((document) => {
-      const data = document.data();
-      films.push({
-        id: Number(data['id']),
-        titre: String(data['titre'] ?? ''),
-        image: String(data['image'] ?? ''),
-        resume: String(data['resume'] ?? ''),
-        annee: Number(data['annee'] ?? 0),
-        note: Number(data['note'] ?? 0),
-      });
-    });
-
-    this.filmsAdmin = films;
     this.filmsAdminCharges = true;
   }
 
@@ -70,101 +47,44 @@ export class FilmService {
     return this.getTous().some((f) => f.titre.trim().toLowerCase() === recherche);
   }
 
-  async ajouter(film: Film): Promise<Film> {
-    await setDoc(doc(this.firebase.db, COLLECTION, String(film.id)), film);
-
-    if (!this.filmsAdmin.some((f) => f.id === film.id)) {
-      this.filmsAdmin = [...this.filmsAdmin, film];
-    }
-
-    return film;
-  }
-
-  private imageTmdb(source: FilmTmdb): string {
-    if (source.poster_path !== null && source.poster_path !== '') {
-      return CONFIG.tmdbUrlImage + source.poster_path;
-    }
-
-    return '';
-  }
-
-  private depuisTmdb(source: FilmTmdb): Film {
+  private depuisApi(source: FilmApi): Film {
     return {
       id: source.id,
-      titre: source.title,
-      image: this.imageTmdb(source),
-      resume: source.overview,
-      annee: Number(source.release_date.slice(0, 4)),
-      note: Math.round(source.vote_average * 10) / 10,
+      titre: source.titre,
+      image: source.image,
+      resume: source.resume,
+      annee: source.annee,
+      note: source.note,
     };
   }
 
-  private getBd(): boolean {
-    return CONFIG.tmdbCleApi.trim() !== '';
-  }
-
-  private getCatalogue(): Film[] {
-    return [...FILMS_DEPART, ...this.filmsAdmin];
-  }
-
-  private memoriser(films: Film[]): Film[] {
-    for (const film of films) {
-      if (!this.filmsMemoire.some((f) => f.id === film.id)) {
-        this.filmsMemoire = [...this.filmsMemoire, film];
-      }
-    }
-
-    return films;
-  }
-
-  private avecImage(films: Film[]): Film[] {
-    return films.filter((film) => film.image !== '');
-  }
-
   getPopulaires(): Observable<Film[]> {
-    if (!this.getBd()) {
-      return of(this.getCatalogue());
-    }
-
-    return this.http
-      .get<ReponseTmdb>(CONFIG.tmdbUrlApi + '/movie/popular', {
-        params: { api_key: CONFIG.tmdbCleApi, language: 'fr-FR' },
-      })
-      .pipe(
-        map((reponse) =>
-          this.avecImage(
-          this.memoriser([
-            ...reponse.results.map((film) => this.depuisTmdb(film)),
-            ...this.filmsAdmin,
-          ]),
-        ),
-        ),
-      );
+    return this.api.get<FilmApi[]>('/films').pipe(
+      map((films) => films.map((film) => this.depuisApi(film))),
+    );
   }
 
   rechercher(texte: string): Observable<Film[]> {
     if (texte.trim() === '') {
-      return of(this.getCatalogue());
+      return this.getPopulaires();
     }
 
-    if (!this.getBd()) {
-      const mot = texte.trim().toLowerCase();
-      return of(this.getCatalogue().filter((f) => f.titre.toLowerCase().includes(mot)));
-    }
+    return this.api
+      .get<FilmApi[]>('/films?query=' + encodeURIComponent(texte))
+      .pipe(map((films) => films.map((film) => this.depuisApi(film))));
+  }
 
-    return this.http
-      .get<ReponseTmdb>(CONFIG.tmdbUrlApi + '/search/movie', {
-        params: { api_key: CONFIG.tmdbCleApi, language: 'fr-FR', query: texte },
-      })
-      .pipe(
-        map((reponse) =>
-          this.avecImage(
-          this.memoriser([
-            ...reponse.results.map((film) => this.depuisTmdb(film)),
-            ...this.filmsAdmin,
-          ]),
-        ),
-        ),
-      );
+  async ajouter(film: Film): Promise<Film> {
+    await firstValueFrom(
+      this.api.post<FilmApi>('/admin/films', {
+        titre: film.titre,
+        resume: film.resume,
+        annee: film.annee,
+        note: film.note,
+      }),
+    );
+
+    this.filmsAdmin = [...this.filmsAdmin, film];
+    return film;
   }
 }
