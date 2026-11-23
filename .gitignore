@@ -70,3 +70,11 @@ yarn-error.log*
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Django
+backend/.venv/
+backend/db.sqlite3
+backend/media/
+backend/**/__pycache__/
+backend/*.pyc
+*.pyc
